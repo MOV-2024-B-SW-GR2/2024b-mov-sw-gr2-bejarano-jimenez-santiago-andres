@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">gr2sw2024b_sabj</string>
+    <string name="app_name" translatable="false">gr2sw2024b_sabj</string>
+    <string name="saludo" translatable="false">Hola Amigos</string>
+    <color name="saludo_color" translatable="false">#000000</color>
+    <drawable name="background_color" translatable="false">#FFFFFF</drawable>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="saludo" translatable="false">Hola Amigos, estoy en Landscape</string>
+    <color name="saludo_color" translatable="false">#673AB7</color>
+    <drawable name="background_color" translatable="false">#FF9800</drawable>
+</resources>

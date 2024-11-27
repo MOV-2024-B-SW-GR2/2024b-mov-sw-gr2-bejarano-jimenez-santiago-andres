@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="saludo" translatable="false">Hola Amigos, estoy en Portrait</string>
+    <color name="saludo_color" translatable="false">#8BC34A</color>
+    <drawable name="background_color" translatable="false">#E91E63</drawable>
+</resources>
