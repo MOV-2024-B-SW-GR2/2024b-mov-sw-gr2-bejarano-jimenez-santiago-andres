@@ -126,3 +126,14 @@ abstract class Numeros( // Constructor Primario
         println("Inicializando")
     }
 }
+
+
+class Suma( // Constructor primario
+    unoParametro: Int, // Parámetro
+    dosParametro: Int, // Parámetros
+) : Numeros( // Clase papa, Numeros (extendiendo)
+    unoParametro,
+    dosParametro
+) {
+
+}
