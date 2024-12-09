@@ -1,0 +1,2 @@
+1,2,Ferrari,Italia,2022,104500.0,true
+2,2,Bugatti,Chiron,2021,1780900.0,true
