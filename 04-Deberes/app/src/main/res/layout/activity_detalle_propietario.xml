@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollDetallePropietario"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layoutDetallePropietario"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvNombreDetallePropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre: " />
+
+        <TextView
+            android:id="@+id/tvIdentificacionDetallePropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Identificación: " />
+
+        <TextView
+            android:id="@+id/tvEdadDetallePropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edad: " />
+
+        <TextView
+            android:id="@+id/tvNumVehiculosDetallePropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vehículos registrados: " />
+    </LinearLayout>
+</ScrollView>

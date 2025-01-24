@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutEditarVehiculo"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etMarcaEditarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Marca" />
+
+    <EditText
+        android:id="@+id/etModeloEditarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Modelo" />
+
+    <EditText
+        android:id="@+id/etAnioEditarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Año" />
+
+    <EditText
+        android:id="@+id/etPrecioEditarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Precio" />
+
+    <Button
+        android:id="@+id/btnGuardarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guardar Cambios" />
+</LinearLayout>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollDetalleVehiculo"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layoutDetalleVehiculo"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvMarcaDetalleVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Marca: " />
+
+        <TextView
+            android:id="@+id/tvModeloDetalleVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modelo: " />
+
+        <TextView
+            android:id="@+id/tvAnioDetalleVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Año: " />
+
+        <TextView
+            android:id="@+id/tvPrecioDetalleVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precio: " />
+
+        <TextView
+            android:id="@+id/tvMatriculadoDetalleVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="¿Matriculado?: " />
+    </LinearLayout>
+</ScrollView>
