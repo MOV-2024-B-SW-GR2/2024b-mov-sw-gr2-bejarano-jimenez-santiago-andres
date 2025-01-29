@@ -1,79 +1,63 @@
-package com.example.gestionvehiculos.ui
+package com.example.gestionvehiculos.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestionvehiculos.R
 import com.example.gestionvehiculos.adapters.PropietarioAdapter
 import com.example.gestionvehiculos.controllers.PropietarioController
 import com.example.gestionvehiculos.models.Propietario
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ListPropietariosActivity : AppCompatActivity() {
-    private val propietarioController = PropietarioController()
-    private lateinit var recyclerViewPropietarios: RecyclerView
-    private lateinit var propietarioAdapter: PropietarioAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: PropietarioAdapter
+    private lateinit var propietarioController: PropietarioController
+
+    companion object {
+        const val EDITAR_PROPIETARIO_REQUEST = 1
+        const val CREAR_PROPIETARIO_REQUEST = 2
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_propietarios)
 
-        // Agregamos datos de ejemplo al controlador (si deseas iniciar con algo de data)
-        propietarioController.addPropietario(
-            Propietario(
-                id = 1,
-                nombre = "Juan Pérez",
-                edad = 30,
-                fechaNacimiento = "1993-01-15",
-                identificacion = "1234567890",
-                numVehiculos = 2
-            )
-        )
-        propietarioController.addPropietario(
-            Propietario(
-                id = 2,
-                nombre = "María Gómez",
-                edad = 25,
-                fechaNacimiento = "1998-05-10",
-                identificacion = "0987654321",
-                numVehiculos = 1
-            )
-        )
+        propietarioController = PropietarioController(this)
+        recyclerView = findViewById(R.id.recyclerPropietarios)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        recyclerViewPropietarios = findViewById(R.id.recyclerPropietarios)
-        recyclerViewPropietarios.layoutManager = LinearLayoutManager(this)
+        // Configurar el adaptador
+        adapter = PropietarioAdapter(propietarioController.getPropietarios()) { propietario ->
+            val intent = Intent(this, DetallePropietarioActivity::class.java)
+            intent.putExtra("propietario", propietario)
+            startActivity(intent)
+        }
+        recyclerView.adapter = adapter
 
-        propietarioAdapter = PropietarioAdapter(
-            propietarioController.getPropietarios(),
-            onVerClick = { propietario -> verPropietario(propietario) },
-            onEditarClick = { propietario -> editarPropietario(propietario) },
-            onEliminarClick = { propietario -> eliminarPropietario(propietario) }
-        )
-
-        recyclerViewPropietarios.adapter = propietarioAdapter
+        // Configurar FAB
+        findViewById<FloatingActionButton>(R.id.fabAddPropietario).setOnClickListener {
+            val intent = Intent(this, EditarPropietarioActivity::class.java)
+            startActivityForResult(intent, CREAR_PROPIETARIO_REQUEST)
+        }
     }
 
-    private fun verPropietario(propietario: Propietario) {
-        val intent = Intent(this, DetallePropietarioActivity::class.java)
-        intent.putExtra("propietario", propietario)
-        startActivity(intent)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && (requestCode == EDITAR_PROPIETARIO_REQUEST || requestCode == CREAR_PROPIETARIO_REQUEST)) {
+            actualizarListaPropietarios()
+        }
     }
 
-    private fun editarPropietario(propietario: Propietario) {
-        val intent = Intent(this, EditarPropietarioActivity::class.java)
-        intent.putExtra("propietario", propietario)
-        startActivity(intent)
+    private fun actualizarListaPropietarios() {
+        adapter.updatePropietarios(propietarioController.getPropietarios())
     }
 
-    private fun eliminarPropietario(propietario: Propietario) {
-        propietarioController.deletePropietario(propietario.id)
-        // Notificamos cambios al adapter
-        recyclerViewPropietarios.adapter = PropietarioAdapter(
-            propietarioController.getPropietarios(),
-            onVerClick = { verPropietario(it) },
-            onEditarClick = { editarPropietario(it) },
-            onEliminarClick = { eliminarPropietario(it) }
-        )
+    override fun onResume() {
+        super.onResume()
+        actualizarListaPropietarios()
     }
 }

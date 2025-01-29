@@ -19,7 +19,7 @@
 
         <!-- Actividad Principal (Menú Principal) -->
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <!-- Esta es la actividad principal (Launcher) -->
@@ -28,34 +28,38 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.MainActivityTemp"
+            android:exported="true" />
+
         <!-- Lista de Propietarios -->
         <activity
-            android:name=".ui.ListPropietariosActivity"
+            android:name=".activities.ListPropietariosActivity"
             android:exported="false"/>
 
         <!-- Lista de Vehículos -->
         <activity
-            android:name=".ui.ListVehiculosActivity"
+            android:name=".activities.ListVehiculosActivity"
             android:exported="false"/>
 
         <!-- Detalle de Propietario -->
         <activity
-            android:name=".ui.DetallePropietarioActivity"
+            android:name=".activities.DetallePropietarioActivity"
             android:exported="false"/>
 
         <!-- Detalle de Vehículo -->
         <activity
-            android:name=".ui.DetalleVehiculoActivity"
+            android:name=".activities.DetalleVehiculoActivity"
             android:exported="false"/>
 
         <!-- Edición de Propietario -->
         <activity
-            android:name=".ui.EditarPropietarioActivity"
+            android:name=".activities.EditarPropietarioActivity"
             android:exported="false"/>
 
         <!-- Edición de Vehículo -->
         <activity
-            android:name=".ui.EditarVehiculoActivity"
+            android:name=".activities.EditarVehiculoActivity"
             android:exported="false"/>
     </application>
 

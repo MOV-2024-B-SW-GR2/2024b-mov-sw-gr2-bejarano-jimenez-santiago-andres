@@ -7,6 +7,18 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Propietario:"
+        android:layout_marginBottom="4dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerPropietario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
+
     <EditText
         android:id="@+id/etMarcaEditarVehiculo"
         android:layout_width="match_parent"
@@ -23,17 +35,26 @@
         android:id="@+id/etAnioEditarVehiculo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Año" />
+        android:hint="Año"
+        android:inputType="number" />
 
     <EditText
         android:id="@+id/etPrecioEditarVehiculo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Precio" />
+        android:hint="Precio"
+        android:inputType="numberDecimal" />
+
+    <CheckBox
+        android:id="@+id/cbMatriculadoEditarVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="¿Está matriculado?" />
 
     <Button
         android:id="@+id/btnGuardarVehiculo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Guardar Cambios" />
+
 </LinearLayout>

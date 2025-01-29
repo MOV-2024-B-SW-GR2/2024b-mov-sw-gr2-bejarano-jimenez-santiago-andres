@@ -1,9 +1,9 @@
-package com.example.gestionvehiculos.ui
+package com.example.gestionvehiculos.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import androidx.cardview.widget.CardView
 import com.example.gestionvehiculos.R
 
 class MainActivity : AppCompatActivity() {
@@ -11,15 +11,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val buttonPropietarios = findViewById<Button>(R.id.btnPropietariosMain)
-        val buttonVehiculos = findViewById<Button>(R.id.btnVehiculosMain)
+        val cardPropietarios = findViewById<CardView>(R.id.btnPropietariosMain)
+        val cardVehiculos = findViewById<CardView>(R.id.btnVehiculosMain)
 
-        buttonPropietarios.setOnClickListener {
-            startActivity(Intent(this, ListPropietariosActivity::class.java))
+        cardPropietarios.setOnClickListener {
+            val intent = Intent(this, ListPropietariosActivity::class.java)
+            startActivity(intent)
         }
 
-        buttonVehiculos.setOnClickListener {
-            startActivity(Intent(this, ListVehiculosActivity::class.java))
+        cardVehiculos.setOnClickListener {
+            val intent = Intent(this, ListVehiculosActivity::class.java)
+            startActivity(intent)
         }
     }
 }

@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layoutItemPropietario"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardItemPropietario"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
-    <TextView
-        android:id="@+id/tvNombreItemPropietario"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Nombre" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnVerItemPropietario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ver" />
+        <TextView
+            android:id="@+id/tvNombreItemPropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre del Propietario"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
-    <Button
-        android:id="@+id/btnEditarItemPropietario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editar" />
+        <TextView
+            android:id="@+id/tvIdentificacionItemPropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
 
-    <Button
-        android:id="@+id/btnEliminarItemPropietario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Eliminar" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvVehiculosItemPropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

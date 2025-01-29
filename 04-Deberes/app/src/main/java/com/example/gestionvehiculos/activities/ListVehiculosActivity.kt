@@ -1,59 +1,50 @@
-package com.example.gestionvehiculos.ui
+package com.example.gestionvehiculos.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestionvehiculos.R
 import com.example.gestionvehiculos.adapters.VehiculoAdapter
 import com.example.gestionvehiculos.controllers.VehiculoController
 import com.example.gestionvehiculos.models.Vehiculo
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ListVehiculosActivity : AppCompatActivity() {
-    private val vehiculoController = VehiculoController()
-    private lateinit var recyclerViewVehiculos: RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private lateinit var vehiculoAdapter: VehiculoAdapter
+    private lateinit var vehiculoController: VehiculoController
+
+    companion object {
+        const val EDITAR_VEHICULO_REQUEST = 1
+        const val CREAR_VEHICULO_REQUEST = 2
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_vehiculos)
 
-        // Datos de ejemplo
-        vehiculoController.addVehiculo(
-            Vehiculo(
-                id = 1,
-                propietarioId = 1,
-                marca = "Toyota",
-                modelo = "Corolla",
-                anio = 2020,
-                precio = 15000.0,
-                estaMatriculado = true
-            )
-        )
-        vehiculoController.addVehiculo(
-            Vehiculo(
-                id = 2,
-                propietarioId = 1,
-                marca = "Chevrolet",
-                modelo = "Spark",
-                anio = 2019,
-                precio = 12000.0,
-                estaMatriculado = false
-            )
-        )
+        vehiculoController = VehiculoController(this)
+        recyclerView = findViewById(R.id.recyclerVehiculos)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        recyclerViewVehiculos = findViewById(R.id.recyclerVehiculos)
-        recyclerViewVehiculos.layoutManager = LinearLayoutManager(this)
+        setupRecyclerView()
 
+        findViewById<FloatingActionButton>(R.id.fabAddVehiculo).setOnClickListener {
+            val intent = Intent(this, EditarVehiculoActivity::class.java)
+            startActivityForResult(intent, CREAR_VEHICULO_REQUEST)
+        }
+    }
+
+    private fun setupRecyclerView() {
         vehiculoAdapter = VehiculoAdapter(
-            vehiculoController.getVehiculos(),
+            vehiculos = vehiculoController.getVehiculos(),
             onVerClick = { vehiculo -> verVehiculo(vehiculo) },
             onEditarClick = { vehiculo -> editarVehiculo(vehiculo) },
             onEliminarClick = { vehiculo -> eliminarVehiculo(vehiculo) }
         )
-
-        recyclerViewVehiculos.adapter = vehiculoAdapter
+        recyclerView.adapter = vehiculoAdapter
     }
 
     private fun verVehiculo(vehiculo: Vehiculo) {
@@ -65,17 +56,24 @@ class ListVehiculosActivity : AppCompatActivity() {
     private fun editarVehiculo(vehiculo: Vehiculo) {
         val intent = Intent(this, EditarVehiculoActivity::class.java)
         intent.putExtra("vehiculo", vehiculo)
-        startActivity(intent)
+        startActivityForResult(intent, EDITAR_VEHICULO_REQUEST)
     }
 
     private fun eliminarVehiculo(vehiculo: Vehiculo) {
         vehiculoController.deleteVehiculo(vehiculo.id)
-        // Refrescamos la lista
-        recyclerViewVehiculos.adapter = VehiculoAdapter(
-            vehiculoController.getVehiculos(),
-            onVerClick = { verVehiculo(it) },
-            onEditarClick = { editarVehiculo(it) },
-            onEliminarClick = { eliminarVehiculo(it) }
-        )
+        setupRecyclerView() // Actualizar la lista después de eliminar
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && 
+            (requestCode == EDITAR_VEHICULO_REQUEST || requestCode == CREAR_VEHICULO_REQUEST)) {
+            setupRecyclerView()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setupRecyclerView()
     }
 }

@@ -1,26 +1,33 @@
 package com.example.gestionvehiculos.controllers
 
+import android.content.Context
+import com.example.gestionvehiculos.database.DatabaseHelper
 import com.example.gestionvehiculos.models.Vehiculo
 
-class VehiculoController {
-    private val vehiculoList = mutableListOf<Vehiculo>()
+class VehiculoController(context: Context) {
+    private val dbHelper = DatabaseHelper(context)
 
-    fun addVehiculo(vehiculo: Vehiculo) {
-        vehiculoList.add(vehiculo)
+    fun addVehiculo(vehiculo: Vehiculo): Long {
+        return dbHelper.insertVehiculo(vehiculo)
     }
 
     fun getVehiculos(): List<Vehiculo> {
-        return vehiculoList
+        return dbHelper.getAllVehiculos()
     }
 
-    fun deleteVehiculo(vehiculoId: Int) {
-        vehiculoList.removeIf { it.id == vehiculoId }
+    fun getVehiculoById(id: Int): Vehiculo? {
+        return dbHelper.getVehiculoById(id)
     }
 
-    fun updateVehiculo(vehiculoId: Int, updatedVehiculo: Vehiculo) {
-        val index = vehiculoList.indexOfFirst { it.id == vehiculoId }
-        if (index != -1) {
-            vehiculoList[index] = updatedVehiculo
-        }
+    fun getVehiculosByPropietarioId(propietarioId: Int): List<Vehiculo> {
+        return dbHelper.getVehiculosByPropietarioId(propietarioId)
+    }
+
+    fun updateVehiculo(vehiculoId: Int, updatedVehiculo: Vehiculo): Int {
+        return dbHelper.updateVehiculo(updatedVehiculo)
+    }
+
+    fun deleteVehiculo(vehiculoId: Int): Int {
+        return dbHelper.deleteVehiculo(vehiculoId)
     }
 }
