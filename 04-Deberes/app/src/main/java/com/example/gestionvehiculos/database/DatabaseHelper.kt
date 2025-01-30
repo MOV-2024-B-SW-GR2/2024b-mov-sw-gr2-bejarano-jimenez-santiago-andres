@@ -11,7 +11,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "GestionVehiculos.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         // Tabla Propietarios
         private const val TABLE_PROPIETARIOS = "propietarios"
@@ -31,6 +31,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val COLUMN_ANIO = "anio"
         private const val COLUMN_PRECIO = "precio"
         private const val COLUMN_MATRICULADO = "matriculado"
+        private const val COLUMN_LATITUD = "latitud"
+        private const val COLUMN_LONGITUD = "longitud"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -50,12 +52,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val createVehiculosTable = """
             CREATE TABLE $TABLE_VEHICULOS (
                 $COLUMN_VEHICULO_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_PROPIETARIO_ID_FK INTEGER NULL,
+                $COLUMN_PROPIETARIO_ID_FK INTEGER,
                 $COLUMN_MARCA TEXT NOT NULL,
                 $COLUMN_MODELO TEXT NOT NULL,
                 $COLUMN_ANIO INTEGER NOT NULL,
                 $COLUMN_PRECIO REAL NOT NULL,
                 $COLUMN_MATRICULADO INTEGER NOT NULL,
+                $COLUMN_LATITUD REAL,
+                $COLUMN_LONGITUD REAL,
                 FOREIGN KEY($COLUMN_PROPIETARIO_ID_FK) REFERENCES $TABLE_PROPIETARIOS($COLUMN_PROPIETARIO_ID)
             )
         """.trimIndent()
@@ -65,9 +69,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_VEHICULOS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PROPIETARIOS")
-        onCreate(db)
+        if (oldVersion < 2) {
+            // Agregar columnas latitud y longitud a la tabla vehículos
+            db.execSQL("ALTER TABLE $TABLE_VEHICULOS ADD COLUMN $COLUMN_LATITUD REAL")
+            db.execSQL("ALTER TABLE $TABLE_VEHICULOS ADD COLUMN $COLUMN_LONGITUD REAL")
+        }
     }
 
     // Métodos para Propietarios
@@ -187,6 +193,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_ANIO, vehiculo.anio)
             put(COLUMN_PRECIO, vehiculo.precio)
             put(COLUMN_MATRICULADO, if (vehiculo.estaMatriculado) 1 else 0)
+            put(COLUMN_LATITUD, vehiculo.latitud)
+            put(COLUMN_LONGITUD, vehiculo.longitud)
         }
         return db.insert(TABLE_VEHICULOS, null, values)
     }
@@ -216,7 +224,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     modelo = getString(getColumnIndexOrThrow(COLUMN_MODELO)),
                     anio = getInt(getColumnIndexOrThrow(COLUMN_ANIO)),
                     precio = getDouble(getColumnIndexOrThrow(COLUMN_PRECIO)),
-                    estaMatriculado = getInt(getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1
+                    estaMatriculado = getInt(getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1,
+                    latitud = getDouble(getColumnIndexOrThrow(COLUMN_LATITUD)),
+                    longitud = getDouble(getColumnIndexOrThrow(COLUMN_LONGITUD))
                 )
                 vehiculos.add(vehiculo)
             }
@@ -236,6 +246,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_ANIO, vehiculo.anio)
             put(COLUMN_PRECIO, vehiculo.precio)
             put(COLUMN_MATRICULADO, if (vehiculo.estaMatriculado) 1 else 0)
+            put(COLUMN_LATITUD, vehiculo.latitud)
+            put(COLUMN_LONGITUD, vehiculo.longitud)
         }
         return db.update(
             TABLE_VEHICULOS,
@@ -277,7 +289,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 modelo = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MODELO)),
                 anio = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ANIO)),
                 precio = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRECIO)),
-                estaMatriculado = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1
+                estaMatriculado = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1,
+                latitud = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_LATITUD)),
+                longitud = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_LONGITUD))
             )
             cursor.close()
             vehiculo
@@ -309,7 +323,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     modelo = getString(getColumnIndexOrThrow(COLUMN_MODELO)),
                     anio = getInt(getColumnIndexOrThrow(COLUMN_ANIO)),
                     precio = getDouble(getColumnIndexOrThrow(COLUMN_PRECIO)),
-                    estaMatriculado = getInt(getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1
+                    estaMatriculado = getInt(getColumnIndexOrThrow(COLUMN_MATRICULADO)) == 1,
+                    latitud = getDouble(getColumnIndexOrThrow(COLUMN_LATITUD)),
+                    longitud = getDouble(getColumnIndexOrThrow(COLUMN_LONGITUD))
                 )
                 vehiculos.add(vehiculo)
             }

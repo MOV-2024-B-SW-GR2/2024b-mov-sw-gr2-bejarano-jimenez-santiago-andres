@@ -4,6 +4,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <!-- Permisos y otras configuraciones globales van aquí, si las necesitas -->
 
     <application
@@ -60,6 +65,14 @@
         <!-- Edición de Vehículo -->
         <activity
             android:name=".activities.EditarVehiculoActivity"
+            android:exported="false"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDQmfqjjB5I3nfFyKhaFDsnF27xfgQsS_g"/>
+
+        <activity
+            android:name=".activities.MapaVehiculoActivity"
             android:exported="false"/>
     </application>
 

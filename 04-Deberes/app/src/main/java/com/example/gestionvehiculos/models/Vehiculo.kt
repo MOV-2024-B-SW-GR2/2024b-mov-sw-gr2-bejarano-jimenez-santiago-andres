@@ -9,5 +9,7 @@ data class Vehiculo(
     var modelo: String,
     var anio: Int,
     var precio: Double,
-    var estaMatriculado: Boolean
+    var estaMatriculado: Boolean,
+    var latitud: Double?,
+    var longitud: Double?
 ) : Serializable

@@ -141,6 +141,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Editar Vehículo" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConcesionarioAutorizado"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Concesionario Autorizado" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

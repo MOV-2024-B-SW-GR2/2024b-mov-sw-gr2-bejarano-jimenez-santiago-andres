@@ -1,6 +1,7 @@
 package com.example.gestionvehiculos.activities
 
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gestionvehiculos.R
@@ -8,128 +9,136 @@ import com.example.gestionvehiculos.controllers.PropietarioController
 import com.example.gestionvehiculos.controllers.VehiculoController
 import com.example.gestionvehiculos.models.Propietario
 import com.example.gestionvehiculos.models.Vehiculo
+import com.google.android.material.button.MaterialButton
 
 class EditarVehiculoActivity : AppCompatActivity() {
     private lateinit var vehiculoController: VehiculoController
     private lateinit var propietarioController: PropietarioController
     private var currentVehiculo: Vehiculo? = null
-    private lateinit var propietarios: List<Propietario>
-    private lateinit var spinnerPropietario: Spinner
+    private var selectedPropietarioId: Int? = null
+
+    // Coordenadas de concesionarios por marca
+    private val coordenadasPorMarca = mapOf(
+        "BYD" to Pair(-0.16328037230738046, -78.46409657195679),
+        "CHANGAN" to Pair(-0.16353122878216622, -78.4642849448021),
+        "SUSUKI" to Pair(-0.16321582258698988, -78.46482447210695),
+        "TOYOTA" to Pair(-0.1636715635643306, -78.46455351702981),
+        "FORD" to Pair(-0.16485347627556404, -78.46561662803389),
+        "AMBACAR" to Pair(-0.1645256603191884, -78.46580127962027),
+        "KIA" to Pair(-0.16468639035102312, -78.4653176997908),
+        "SINOTRUCK" to Pair(-0.16538906981238766, -78.46677223588343),
+        "CHEVROLET" to Pair(-0.16555681438051725, -78.4679061280807),
+        "GWM" to Pair(-0.1662764345326828, -78.46873541023623),
+        "MG" to Pair(-0.16605680110745694, -78.46914974496825),
+        "JAC" to Pair(-0.16602260308678954, -78.46936231003363),
+        "AUDI" to Pair(-0.16794788735268443, -78.47142478035467),
+        "VOLKSWAGEN" to Pair(-0.1680397526147777, -78.47160582946398),
+        "GEELY" to Pair(-0.16855660555067054, -78.47268104449452),
+        "SUBARU" to Pair(-0.16861024949772352, -78.47296267644235),
+        "MAZDA" to Pair(-0.16832063422091117, -78.47397313747251),
+        "CHERY" to Pair(-0.16836623157645772, -78.4741763148063),
+        "DONGFENG" to Pair(-0.16845442771465383, -78.47436127254727),
+        "RAM" to Pair(-0.1685241648465135, -78.47458456644826),
+        "DODGE" to Pair(-0.1685241648465135, -78.47458456644826),
+        "JEEP" to Pair(-0.1685241648465135, -78.47458456644826),
+        "FIAT" to Pair(-0.1685241648465135, -78.47458456644826),
+        "NISSAN" to Pair(-0.16900741087889484, -78.4750559570922)
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_vehiculo)
 
+        // Inicializar controladores
         vehiculoController = VehiculoController(this)
         propietarioController = PropietarioController(this)
+
+        // Obtener el vehículo si estamos editando
         currentVehiculo = intent.getSerializableExtra("vehiculo") as? Vehiculo
 
-        // Inicializar vistas
-        spinnerPropietario = findViewById(R.id.spinnerPropietario)
-        val editTextMarca = findViewById<EditText>(R.id.etMarcaEditarVehiculo)
-        val editTextModelo = findViewById<EditText>(R.id.etModeloEditarVehiculo)
-        val editTextAnio = findViewById<EditText>(R.id.etAnioEditarVehiculo)
-        val editTextPrecio = findViewById<EditText>(R.id.etPrecioEditarVehiculo)
-        val checkBoxMatriculado = findViewById<CheckBox>(R.id.cbMatriculadoEditarVehiculo)
-        val buttonGuardar = findViewById<Button>(R.id.btnGuardarVehiculo)
+        // Configurar Spinner de marcas
+        val spinnerMarca = findViewById<Spinner>(R.id.spinnerMarca)
+        val marcas = coordenadasPorMarca.keys.toList().sorted()
+        val adapterMarcas = ArrayAdapter(this, android.R.layout.simple_spinner_item, marcas)
+        adapterMarcas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerMarca.adapter = adapterMarcas
+
+        // Configurar campos de entrada
+        val etModelo = findViewById<EditText>(R.id.etModeloEditarVehiculo)
+        val etAnio = findViewById<EditText>(R.id.etAnioEditarVehiculo)
+        val etPrecio = findViewById<EditText>(R.id.etPrecioEditarVehiculo)
+        val cbMatriculado = findViewById<CheckBox>(R.id.cbMatriculadoEditarVehiculo)
+        val spinnerPropietario = findViewById<Spinner>(R.id.spinnerPropietarioEditarVehiculo)
 
         // Cargar propietarios en el spinner
-        cargarPropietarios()
+        val propietarios = propietarioController.getPropietarios()
+        val propietariosAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            propietarios.map { "${it.nombre} (${it.identificacion})" }
+        )
+        propietariosAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerPropietario.adapter = propietariosAdapter
 
-        // Cargar datos si es una edición
+        // Si estamos editando, cargar datos del vehículo
         currentVehiculo?.let { vehiculo ->
-            editTextMarca.setText(vehiculo.marca)
-            editTextModelo.setText(vehiculo.modelo)
-            editTextAnio.setText(vehiculo.anio.toString())
-            editTextPrecio.setText(vehiculo.precio.toString())
-            checkBoxMatriculado.isChecked = vehiculo.estaMatriculado
-            
-            // Seleccionar el propietario actual en el spinner
-            val propietarioIndex = propietarios.indexOfFirst { it.id == vehiculo.propietarioId }
-            if (propietarioIndex >= 0) {
-                spinnerPropietario.setSelection(propietarioIndex)
-            }
-        }
-
-        buttonGuardar.setOnClickListener {
-            val marca = editTextMarca.text.toString().trim()
-            val modelo = editTextModelo.text.toString().trim()
-            val anioStr = editTextAnio.text.toString().trim()
-            val precioStr = editTextPrecio.text.toString().trim()
-
-            if (marca.isBlank() || modelo.isBlank() || anioStr.isBlank() || precioStr.isBlank()) {
-                Toast.makeText(this, "Por favor complete todos los campos", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            // Seleccionar la marca actual
+            val marcaIndex = marcas.indexOf(vehiculo.marca)
+            if (marcaIndex != -1) {
+                spinnerMarca.setSelection(marcaIndex)
             }
 
-            if (spinnerPropietario.selectedItemPosition == -1) {
-                Toast.makeText(this, "Por favor seleccione un propietario", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            etModelo.setText(vehiculo.modelo)
+            etAnio.setText(vehiculo.anio.toString())
+            etPrecio.setText(vehiculo.precio.toString())
+            cbMatriculado.isChecked = vehiculo.estaMatriculado
 
-            try {
-                val anio = anioStr.toInt()
-                val precio = precioStr.toDouble()
-                val propietarioSeleccionado = propietarios[spinnerPropietario.selectedItemPosition]
-
-                if (currentVehiculo != null) {
-                    // Actualizar vehículo existente
-                    val vehiculoActualizado = Vehiculo(
-                        id = currentVehiculo!!.id,
-                        propietarioId = propietarioSeleccionado.id,
-                        marca = marca,
-                        modelo = modelo,
-                        anio = anio,
-                        precio = precio,
-                        estaMatriculado = checkBoxMatriculado.isChecked
-                    )
-                    
-                    val resultado = vehiculoController.updateVehiculo(currentVehiculo!!.id, vehiculoActualizado)
-                    if (resultado > 0) {
-                        setResult(RESULT_OK)
-                        finish()
-                    } else {
-                        Toast.makeText(this, "Error al actualizar el vehículo", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    // Crear nuevo vehículo
-                    val nuevoVehiculo = Vehiculo(
-                        id = 0,
-                        propietarioId = propietarioSeleccionado.id,
-                        marca = marca,
-                        modelo = modelo,
-                        anio = anio,
-                        precio = precio,
-                        estaMatriculado = checkBoxMatriculado.isChecked
-                    )
-                    
-                    val resultado = vehiculoController.addVehiculo(nuevoVehiculo)
-                    if (resultado > 0) {
-                        setResult(RESULT_OK)
-                        finish()
-                    } else {
-                        Toast.makeText(this, "Error al crear el vehículo", Toast.LENGTH_SHORT).show()
+            // Seleccionar el propietario actual
+            vehiculo.propietarioId?.let { propId ->
+                val propietario = propietarioController.getPropietarioById(propId)
+                propietario?.let {
+                    val index = propietarios.indexOf(it)
+                    if (index != -1) {
+                        spinnerPropietario.setSelection(index)
                     }
                 }
-            } catch (e: NumberFormatException) {
-                Toast.makeText(this, "Por favor ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
-    private fun cargarPropietarios() {
-        propietarios = propietarioController.getPropietarios()
-        
-        if (propietarios.isEmpty()) {
-            Toast.makeText(this, "No hay propietarios registrados. Por favor, registre un propietario primero.", Toast.LENGTH_LONG).show()
-            finish()
-            return
+        // Manejar selección de propietario
+        spinnerPropietario.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedPropietarioId = propietarios[position].id
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedPropietarioId = null
+            }
         }
 
-        // Crear el adaptador para el spinner
-        val nombresPropietarios = propietarios.map { "${it.nombre} (${it.identificacion})" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresPropietarios)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerPropietario.adapter = adapter
+        // Configurar botón de guardar
+        findViewById<MaterialButton>(R.id.btnGuardarVehiculo).setOnClickListener {
+            val marca = marcas[spinnerMarca.selectedItemPosition]
+            val coordenadas = coordenadasPorMarca[marca]
+
+            val vehiculo = Vehiculo(
+                id = currentVehiculo?.id ?: 0,
+                propietarioId = selectedPropietarioId,
+                marca = marca,
+                modelo = etModelo.text.toString(),
+                anio = etAnio.text.toString().toIntOrNull() ?: 0,
+                precio = etPrecio.text.toString().toDoubleOrNull() ?: 0.0,
+                estaMatriculado = cbMatriculado.isChecked,
+                latitud = coordenadas?.first,
+                longitud = coordenadas?.second
+            )
+
+            if (currentVehiculo == null) {
+                vehiculoController.addVehiculo(vehiculo)
+            } else {
+                vehiculoController.updateVehiculo(currentVehiculo!!.id, vehiculo)
+            }
+
+            finish()
+        }
     }
 }
