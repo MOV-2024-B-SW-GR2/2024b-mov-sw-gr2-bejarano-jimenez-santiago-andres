@@ -8,6 +8,8 @@ import android.provider.MediaStore
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,8 +35,20 @@ class EditRecipeActivity : AppCompatActivity() {
     private lateinit var nameEditText: TextInputEditText
     private lateinit var stepsEditText: TextInputEditText
 
+    // Activity Result API
+    private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                selectedImageUri = uri
+                Glide.with(this)
+                    .load(uri)
+                    .into(findViewById(R.id.ivRecipeImage))
+                findViewById<android.widget.TextView>(R.id.tvAddImage).text = "Cambiar imagen"
+            }
+        }
+    }
+
     companion object {
-        private const val PICK_IMAGE_REQUEST = 1
         const val EXTRA_RECIPE_ID = "recipe_id"
         const val EXTRA_VIEW_MODE = "view_mode"
     }
@@ -63,26 +77,29 @@ class EditRecipeActivity : AppCompatActivity() {
         if (recipeId != 0) {
             loadRecipe()
         }
+
+        // Configurar el manejo del botón de retroceso
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     private fun setViewMode() {
-        // Deshabilitar edición
         nameEditText.isEnabled = false
         stepsEditText.isEnabled = false
         
-        // Ocultar botones de edición
         findViewById<View>(R.id.cvRecipeImage).isClickable = false
         findViewById<View>(R.id.btnAddIngredient).visibility = View.GONE
         findViewById<View>(R.id.btnSaveRecipe).visibility = View.GONE
         
-        // Deshabilitar selección de categoría
         val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.rgCategory)
         chipGroup.isEnabled = false
         for (i in 0 until chipGroup.childCount) {
             chipGroup.getChildAt(i).isEnabled = false
         }
         
-        // Cambiar título
         supportActionBar?.title = "Detalles de la Receta"
     }
 
@@ -108,7 +125,7 @@ class EditRecipeActivity : AppCompatActivity() {
     private fun setupListeners() {
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.cvRecipeImage).setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+            pickImage.launch(intent)
         }
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnAddIngredient).setOnClickListener {
@@ -220,7 +237,6 @@ class EditRecipeActivity : AppCompatActivity() {
         saveResult.onSuccess { newRecipeId ->
             if (recipeId == 0) recipeId = newRecipeId.toInt()
             
-            // Guardar ingredientes
             ingredients.forEach { ingredient ->
                 ingredientController.insertIngredient(ingredient).onSuccess { ingredientId ->
                     ingredientController.addIngredientToRecipe(recipeId, ingredientId.toInt())
@@ -234,22 +250,9 @@ class EditRecipeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            selectedImageUri = data.data
-            selectedImageUri?.let {
-                Glide.with(this)
-                    .load(it)
-                    .into(findViewById(R.id.ivRecipeImage))
-                findViewById<android.widget.TextView>(R.id.tvAddImage).text = "Cambiar imagen"
-            }
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            finish()
             return true
         }
         return super.onOptionsItemSelected(item)
