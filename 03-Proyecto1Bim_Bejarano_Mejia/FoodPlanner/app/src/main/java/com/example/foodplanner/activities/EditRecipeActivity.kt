@@ -20,6 +20,7 @@ import com.example.foodplanner.controllers.IngredientController
 import com.example.foodplanner.controllers.RecipeController
 import com.example.foodplanner.models.Ingredient
 import com.example.foodplanner.models.Recipe
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 
 class EditRecipeActivity : AppCompatActivity() {
@@ -78,7 +79,6 @@ class EditRecipeActivity : AppCompatActivity() {
             loadRecipe()
         }
 
-        // Configurar el manejo del botón de retroceso
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
@@ -94,12 +94,6 @@ class EditRecipeActivity : AppCompatActivity() {
         findViewById<View>(R.id.btnAddIngredient).visibility = View.GONE
         findViewById<View>(R.id.btnSaveRecipe).visibility = View.GONE
         
-        val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.rgCategory)
-        chipGroup.isEnabled = false
-        for (i in 0 until chipGroup.childCount) {
-            chipGroup.getChildAt(i).isEnabled = false
-        }
-        
         supportActionBar?.title = "Detalles de la Receta"
     }
 
@@ -112,8 +106,23 @@ class EditRecipeActivity : AppCompatActivity() {
         val recyclerView = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvIngredients)
         ingredientAdapter = IngredientAdapter(ingredients) { position ->
             if (!isViewMode) {
-                ingredients.removeAt(position)
-                ingredientAdapter.notifyItemRemoved(position)
+                val ingredientToRemove = ingredients[position]
+                if (recipeId != 0) {
+                    ingredientController.removeIngredientFromRecipe(recipeId, ingredientToRemove.id)
+                        .onSuccess {
+                            ingredients.removeAt(position)
+                            ingredientAdapter.notifyItemRemoved(position)
+                            Toast.makeText(this, "Ingrediente eliminado", Toast.LENGTH_SHORT).show()
+                            // Recargar ingredientes para asegurar sincronización
+                            loadIngredients()
+                        }
+                        .onFailure {
+                            Toast.makeText(this, "Error al eliminar el ingrediente", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    ingredients.removeAt(position)
+                    ingredientAdapter.notifyItemRemoved(position)
+                }
             }
         }
         recyclerView.apply {
@@ -145,9 +154,26 @@ class EditRecipeActivity : AppCompatActivity() {
                 
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.rgCategory)
                 when (it.category) {
-                    "Desayuno" -> chipGroup.check(R.id.chipBreakfast)
-                    "Almuerzo" -> chipGroup.check(R.id.chipLunch)
-                    "Merienda" -> chipGroup.check(R.id.chipSnack)
+                    "Desayuno" -> {
+                        chipGroup.check(R.id.chipBreakfast)
+                        updateChipAppearance(chipGroup.findViewById(R.id.chipBreakfast))
+                    }
+                    "Almuerzo" -> {
+                        chipGroup.check(R.id.chipLunch)
+                        updateChipAppearance(chipGroup.findViewById(R.id.chipLunch))
+                    }
+                    "Merienda" -> {
+                        chipGroup.check(R.id.chipSnack)
+                        updateChipAppearance(chipGroup.findViewById(R.id.chipSnack))
+                    }
+                }
+                
+                if (isViewMode) {
+                    chipGroup.isEnabled = false
+                    for (i in 0 until chipGroup.childCount) {
+                        val chip = chipGroup.getChildAt(i) as Chip
+                        chip.isEnabled = false
+                    }
                 }
                 
                 it.imageUri?.let { uri ->
@@ -169,6 +195,15 @@ class EditRecipeActivity : AppCompatActivity() {
             }
         }.onFailure {
             Toast.makeText(this, "Error al cargar la receta", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateChipAppearance(chip: Chip) {
+        if (chip.isChecked) {
+            chip.setTextColor(resources.getColor(R.color.white, theme))
+            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                resources.getColor(R.color.colorPrimary, theme)
+            )
         }
     }
 
@@ -235,11 +270,13 @@ class EditRecipeActivity : AppCompatActivity() {
         }
 
         saveResult.onSuccess { newRecipeId ->
-            if (recipeId == 0) recipeId = newRecipeId.toInt()
-            
-            ingredients.forEach { ingredient ->
-                ingredientController.insertIngredient(ingredient).onSuccess { ingredientId ->
-                    ingredientController.addIngredientToRecipe(recipeId, ingredientId.toInt())
+            if (recipeId == 0) {
+                recipeId = newRecipeId.toInt()
+                // Solo insertar ingredientes si es una receta nueva
+                ingredients.forEach { ingredient ->
+                    ingredientController.insertIngredient(ingredient).onSuccess { ingredientId ->
+                        ingredientController.addIngredientToRecipe(recipeId, ingredientId.toInt())
+                    }
                 }
             }
 

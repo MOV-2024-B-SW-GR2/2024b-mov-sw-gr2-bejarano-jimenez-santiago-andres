@@ -67,13 +67,23 @@ class IngredientController(context: Context) {
     fun removeIngredientFromRecipe(recipeId: Int, ingredientId: Int): Result<Int> {
         return try {
             val db = dbHelper.writableDatabase
-            val rowsAffected = db.delete(
+            
+            // Primero eliminar la relación en la tabla recipe_ingredient
+            val deletedRows = db.delete(
                 DatabaseHelper.TABLE_RECIPE_INGREDIENT,
                 "${DatabaseHelper.COL_RECIPE_INGREDIENT_RECIPE_ID} = ? AND ${DatabaseHelper.COL_RECIPE_INGREDIENT_INGREDIENT_ID} = ?",
                 arrayOf(recipeId.toString(), ingredientId.toString())
             )
+            
+            // Luego eliminar el ingrediente
+            db.delete(
+                DatabaseHelper.TABLE_INGREDIENT,
+                "${DatabaseHelper.COL_INGREDIENT_ID} = ?",
+                arrayOf(ingredientId.toString())
+            )
+            
             db.close()
-            Result.success(rowsAffected)
+            Result.success(deletedRows)
         } catch (e: Exception) {
             Result.failure(e)
         }
